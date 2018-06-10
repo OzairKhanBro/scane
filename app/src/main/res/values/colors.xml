@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#ff294c</color>
+    <color name="colorPrimaryDark">#d2003b</color>
+    <color name="colorAccent">#f94764</color>
+    <color name="transparent">#58000000</color>
+    <color name="bg_row_background">#000000</color>
+    <color name="item_name">#f4f0f0</color>
+    <color name="listBackGroung">#ffffff</color>
+    <color name="SelectedListItem">#d2d2d2</color>
+    <color name="ListItemBackGroung">#ffffff</color>
+
+</resources>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.uzair.scane.main_dashbord"
+    android:theme="@style/AppTheme.NoActionBar"
+    >
+
+    <FrameLayout
+        android:id="@+id/fragements_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </FrameLayout>
+    <RelativeLayout
+        android:id="@+id/main_screen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+
+        <ImageView
+            android:id="@+id/_center_image"
+            android:layout_above="@+id/bottom_bar"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            />
+
+        <LinearLayout
+            android:id="@+id/bottom_bar"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/transparent"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:weightSum="5">
+
+            <ImageView
+                android:id="@+id/_crop"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="right|top"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:src="@drawable/ic_crop_rotate_black_24dp"
+                android:tint="@android:color/white" />
+
+
+            <ImageView
+                android:id="@+id/_rotate_left"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="right|top"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:src="@drawable/ic_rotate_left_black_24dp"
+                android:tint="@android:color/white" />
+
+            <ImageView
+                android:id="@+id/_rotate_right"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="right|top"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:src="@drawable/ic_rotate_right_black_24dp"
+                android:tint="@android:color/white" />
+
+            <ImageView
+
+                android:id="@+id/_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="right|top"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:src="@drawable/ic_filter_black_24dp"
+                android:tint="@android:color/white" />
+
+            <ImageView
+                android:id="@+id/_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="right|top"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:src="@drawable/ic_delete_black_24dp"
+                android:tint="@android:color/white" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/_open_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            app:srcCompat="@drawable/camera_128" />
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/_folder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="@dimen/fab_margin"
+                app:srcCompat="@drawable/ui_crop_magnifier" />
+
+            </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

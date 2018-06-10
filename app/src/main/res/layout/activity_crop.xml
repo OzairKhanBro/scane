@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context="com.example.uzair.scane.CropActivity">
+
+<LinearLayout
+    android:id="@+id/buttons"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:layout_centerHorizontal="true"
+    android:background="@color/transparent"
+    android:weightSum="3"
+    >
+
+    <Button
+        android:id="@+id/Cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@color/transparent"
+
+        android:text="Cancel"
+        android:textColor="@android:color/white" />
+
+    <Button
+
+        android:textColor="@android:color/white"
+        android:id="@+id/cropButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@color/transparent"
+        android:text="Crop" />
+
+    <Button
+        android:id="@+id/rotateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@color/transparent"
+        android:text="Rotate"
+
+        android:textColor="@android:color/white"/>
+
+
+</LinearLayout>
+
+<net.doo.snap.ui.EditPolygonImageView
+    android:id="@+id/polygonView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="40dp"
+    app:edgeColor="#00cea6"
+    app:cornerImageSrc="@drawable/ui_crop_corner_handle"
+    app:edgeImageSrc="@drawable/ui_crop_side_handle"
+
+    app:editPolygonHandleSize="48dp"
+    app:magneticLineTreshold="10dp"
+    android:layout_above="@+id/buttons"/>
+
+<net.doo.snap.ui.MagnifierView
+    android:id="@+id/magnifier"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="40dp"
+    app:magnifierImageSrc="@drawable/ui_crop_magnifier"
+
+    app:magnifierRadius="36dp"
+    app:magnifierMargin="16dp"
+    android:layout_above="@+id/buttons"/>
+
+
+
+</RelativeLayout>

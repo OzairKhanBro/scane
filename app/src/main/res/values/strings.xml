@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">scane</string>
+    <string name="show_camera_dialog">Show camera dialog</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_main_fragement">Main_fragement</string>
+    <string name="title_activity_dashbord">DashbordActivity</string>
+    <string name="title_activity_main2">Main2Activity</string>
+</resources>

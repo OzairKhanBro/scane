@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.uzair.scane.CameraFragement">
+
+
+    <net.doo.snap.camera.ScanbotCameraView
+        android:id="@+id/camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <net.doo.snap.ui.PolygonView
+            android:id="@+id/polygonView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:polygonStrokeWidth="8dp"
+            app:polygonStrokeColor="@color/material_deep_teal_200"
+            app:polygonFillColor="#55009688"/>
+
+    </net.doo.snap.camera.ScanbotCameraView>
+
+    <ImageView
+        android:id="@+id/result"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="bottom|right" />
+
+    <ImageView
+        android:id="@+id/snap"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:clickable="true"
+        android:layout_gravity="bottom|center_horizontal"
+        android:src="@drawable/if_lens_1055037"
+        android:text="Snap"
+
+        />
+
+
+    <ImageView
+        android:id="@+id/flash"
+        android:layout_width="40dp"
+        android:clickable="true"
+        android:layout_height="40dp"
+        android:layout_gravity="top|right"
+        android:text="Flash"
+        android:src="@drawable/if_flash_light_2639815"
+        android:tint="@android:color/white"
+        />
+
+    <ImageView
+        android:id="@+id/autoSnappingToggle"
+        android:layout_width="40dp"
+        android:clickable="true"
+        android:layout_height="40dp"
+        android:layout_gravity="top|left"
+        android:text="Automatic"
+        android:src="@drawable/meter_01_28"
+        android:tint="@android:color/white"
+        />
+
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/ic_image_black_24dp"
+        android:tint="@android:color/white"
+        android:layout_gravity="bottom"
+        android:id="@+id/select_from_gallery"
+        />
+</FrameLayout>

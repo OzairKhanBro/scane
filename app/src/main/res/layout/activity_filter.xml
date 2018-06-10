@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.uzair.scane.FilterActivity">
+       <ImageView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/filterImage"
+
+    />
+     <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@color/transparent"
+        android:weightSum="2"
+        >
+
+        <Button
+            android:id="@+id/Cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+
+            android:text="Cancel"
+            android:textColor="@android:color/white" />
+
+        <Button
+
+            android:textColor="@android:color/white"
+            android:id="@+id/done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:text="Done" />
+
+
+    </LinearLayout>
+
+    <RadioGroup
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/buttons"
+        android:layout_marginBottom="50dp"
+        android:id="@+id/radio_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/transparent"
+        >
+
+
+        <RadioButton
+            android:textColor="@android:color/white"
+            android:id="@+id/_gray"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gray "/>
+        <RadioButton
+            android:textColor="@android:color/white"
+            android:id="@+id/_black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Black "/>
+        <RadioButton
+            android:id="@+id/_enh"
+            android:layout_width="wrap_content"
+            android:textColor="@android:color/white"
+            android:layout_height="wrap_content"
+            android:text="enh "/>
+        <RadioButton
+            android:id="@+id/_clr"
+            android:textColor="@android:color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="clr"/>
+        <RadioButton
+            android:textColor="@android:color/white"
+            android:id="@+id/_b_w"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="B W"/>
+        <RadioButton
+            android:checked="true"
+            android:textColor="@android:color/white"
+            android:id="@+id/_none"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="None "/>
+
+
+    </RadioGroup>
+
+
+
+
+</RelativeLayout>
