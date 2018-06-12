@@ -50,6 +50,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                         i.getName());
         holder.size.setText(i.getSize());
         holder.created.setText(i.getCreated());
+        if(i.getUri().toString().indexOf("pdf")==-1)
         Picasso.get().load(i.getUri()).fit().into(holder.image);
 
         if(i.isChecked())

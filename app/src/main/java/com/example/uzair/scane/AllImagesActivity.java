@@ -1,6 +1,8 @@
 package com.example.uzair.scane;
 
+import android.app.AlertDialog;
 import android.content.ClipData;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -44,6 +46,143 @@ public class AllImagesActivity extends AppCompatActivity
     private ImageAdapter mAdapter;
     private boolean listing_Enabled;
     private ActionMode actionMode;
+
+    private void openThisImage(int position) {
+        ImageDetails movie = list.get(position);
+        if(movie.getUri().toString().indexOf("pdf")!=-1)
+            viewPdf(movie.getUri());
+
+        else
+        {
+            Intent i=new Intent(AllImagesActivity.this,main_dashbord.class);
+            i.putExtra("Uri",movie.getUri());
+            i.setData(movie.getUri());
+            startActivity(i);
+        }
+    }
+
+    private void checkedItem(int position) {
+        list.get(position).setChecked(!list.get(position).isChecked());
+        //actionMode.setCustomView();
+        if(getSelectedImagesCount()==0 && actionMode!=null)
+        {
+            actionMode.finish();
+        }
+        mAdapter.notifyItemChanged(position);
+        Log.d("clicked image",list.get((position)).getName());
+    }
+
+    private void deSelectAll() {
+        int c=0;
+        for (Iterator<ImageDetails> it = list.iterator(); it.hasNext(); ) {
+            ImageDetails i = it.next();
+            if (i.isChecked()) {
+                i.setChecked(false);
+                mAdapter.notifyItemChanged(c);
+            }
+            c++;
+        }
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        prepareImageData();
+
+    }
+
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        //if(true)return;
+        if (viewHolder instanceof ImageAdapter.ImageViewHolder) {
+            // get the removed item name to display it in snack bar
+            String name = list.get(viewHolder.getAdapterPosition()).getName();
+
+            // backup of removed item for undo purpose
+            final ImageDetails deletedItem = list.get(viewHolder.getAdapterPosition());
+            final int deletedIndex = viewHolder.getAdapterPosition();
+
+            // remove the item from recycler view
+            //Log.d("details",""+viewHolder.getAdapterPosition()+" "+list.size());
+            ImageDetails d=list.get(viewHolder.getAdapterPosition());
+            Uri uri=d.getUri();
+            final File f=new File(URI.create(uri.toString()));
+            final Timer timer=new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if(f.exists()) {
+                        Log.d("asyn","file deleted");
+                        f.delete();
+                    }else
+                    Log.d("asyn","file not deleted");
+                }
+            },3500);
+            mAdapter.removeItem(viewHolder.getAdapterPosition());
+            // showing snack bar with Undo option
+            Snackbar snackbar = Snackbar
+                    .make(findViewById(R.id.constrain_layout)
+                            , name + " removed from cart!", Snackbar.LENGTH_LONG);
+            snackbar.setAction("UNDO", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    timer.cancel();
+                    // undo is selected, restore the deleted item
+                    mAdapter.restoreItem(deletedItem, deletedIndex);
+                }
+            });
+            snackbar.setActionTextColor(Color.YELLOW);
+            snackbar.show();
+        }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        new MenuInflater(AllImagesActivity.this).inflate(R.menu.image_list_gallery,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case R.id.delete_all:
+            {
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(AllImagesActivity.this);
+                builder.setTitle("Are you sure want to delete all images?")
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        for (Iterator<ImageDetails> it = list.iterator(); it.hasNext(); ) {
+                                ImageDetails i = it.next();
+                                Uri uri = i.getUri();
+                                File f = new File(URI.create(uri.toString()));
+                                f.delete();
+
+                        }
+                        list.clear();
+                        mAdapter.notifyDataSetChanged();
+                        }
+                }).show();
+
+            }
+            break;
+            case R.id.shere_:break;
+            case R.id.delete_button_item:
+
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,108 +229,6 @@ public class AllImagesActivity extends AppCompatActivity
             }
         }));
 
-        prepareImageData();
-    }
-
-    private void openThisImage(int position) {
-        ImageDetails movie = list.get(position);
-        Intent i=new Intent(AllImagesActivity.this,main_dashbord.class);
-        i.setData(movie.getUri());
-        startActivity(i);
-    }
-
-    private void checkedItem(int position) {
-        list.get(position).setChecked(!list.get(position).isChecked());
-        //actionMode.setCustomView();
-        if(getSelectedImagesCount()==0 && actionMode!=null)
-        {
-            actionMode.finish();
-        }
-        mAdapter.notifyItemChanged(position);
-        Log.d("clicked image",list.get((position)).getName());
-    }
-
-
-    private void deSelectAll() {
-        int c=0;
-        for (Iterator<ImageDetails> it = list.iterator(); it.hasNext(); ) {
-            ImageDetails i = it.next();
-            if (i.isChecked()) {
-                i.setChecked(false);
-                mAdapter.notifyItemChanged(c);
-            }
-            c++;
-        }
-    }
-    @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        //if(true)return;
-        if (viewHolder instanceof ImageAdapter.ImageViewHolder) {
-            // get the removed item name to display it in snack bar
-            String name = list.get(viewHolder.getAdapterPosition()).getName();
-
-            // backup of removed item for undo purpose
-            final ImageDetails deletedItem = list.get(viewHolder.getAdapterPosition());
-            final int deletedIndex = viewHolder.getAdapterPosition();
-
-            // remove the item from recycler view
-            //Log.d("details",""+viewHolder.getAdapterPosition()+" "+list.size());
-            ImageDetails d=list.get(viewHolder.getAdapterPosition());
-            Uri uri=d.getUri();
-            final File f=new File(URI.create(uri.toString()));
-            final Timer timer=new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if(f.exists()) {
-                        Log.d("asyn","file deleted");
-                        f.delete();
-                    }else
-                    Log.d("asyn","file not deleted");
-                }
-            },3500);
-            mAdapter.removeItem(viewHolder.getAdapterPosition());
-            // showing snack bar with Undo option
-            Snackbar snackbar = Snackbar
-                    .make(findViewById(R.id.constrain_layout)
-                            , name + " removed from cart!", Snackbar.LENGTH_LONG);
-            snackbar.setAction("UNDO", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    timer.cancel();
-                    // undo is selected, restore the deleted item
-                    mAdapter.restoreItem(deletedItem, deletedIndex);
-                }
-            });
-            snackbar.setActionTextColor(Color.YELLOW);
-            snackbar.show();
-        }
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        new MenuInflater(AllImagesActivity.this).inflate(R.menu.image_list_gallery,menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId())
-        {
-            case R.id.delete_all:
-            {
-                    list.clear();
-                    mAdapter.notifyDataSetChanged();
-            }
-            break;
-            case R.id.shere_:break;
-            case R.id.delete_button_item:
-
-
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
 
@@ -345,6 +382,12 @@ public class AllImagesActivity extends AppCompatActivity
             }
         };
 
+    private void viewPdf(Uri Filename){
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Filename, "application/pdf");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(intent);
+    }
 
 
 }

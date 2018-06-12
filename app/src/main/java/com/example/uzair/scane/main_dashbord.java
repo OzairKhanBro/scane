@@ -26,24 +26,31 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.pdf.PdfDocument;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.net.URI;
 
-public class main_dashbord extends AppCompatActivity implements View.OnClickListener{
+public class main_dashbord extends AppCompatActivity implements View.OnClickListener {
 
     public static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1531;
     private static final int RESULT_LOAD_IMAGE = 456;
     private static final int CAMERA_REQUEST_CODE = 64;
-    public static final File APP_FOLDER_ABSOLUTE_PATH= new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/"+"scane");
-    private static final String MY_APP_FOLDER="scane";
+    public static final File APP_FOLDER_ABSOLUTE_PATH = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/" + "scane");
+    private static final String MY_APP_FOLDER = "scane";
 
     private boolean cameraPermissionGranted;
     private ImageView save;
@@ -59,6 +66,8 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
     private long lastRotationEventTs;
     private int rotationDegrees;
     private CameraFragement cameraFragement;
+    private boolean edditing;
+    private Uri edditingUri;
 
 
     @Override
@@ -82,9 +91,8 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
                 }
                 break;
             }
-            case CAMERA_REQUEST_CODE:
-            {
-                cameraPermissionGranted=true;
+            case CAMERA_REQUEST_CODE: {
+                cameraPermissionGranted = true;
 
                 break;
             }
@@ -106,6 +114,7 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
 //            try {
 ////                Intent IntentGallery = new Intent(getApplication(), main_dashbord.class);
 ////                IntentGallery.setData(imageUri);
+////                IntentGallery.setData(imageUri);
 //////                IntentGallery.removeExtra("image");
 //////                IntentGallery.putExtra("image",selectedImage);
 ////                startActivity(IntentGallery);
@@ -123,21 +132,22 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)  {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setSupportActionBar((Toolbar) findViewById(R.id.camera_toolbar));
         setContentView(R.layout.activity_main_dashbord);
+        edditing=false;
 
-        cameraFragement=null;
-        openFolder=findViewById(R.id._folder);
-        rotateLeft=findViewById(R.id._rotate_left);
-        rotateRight=findViewById(R.id._rotate_right);
-        delete=findViewById(R.id._delete);
-        crop=findViewById(R.id._crop);
+        cameraFragement = null;
+        openFolder = findViewById(R.id._folder);
+        rotateLeft = findViewById(R.id._rotate_left);
+        rotateRight = findViewById(R.id._rotate_right);
+        delete = findViewById(R.id._delete);
+        crop = findViewById(R.id._crop);
         //share=findViewById(R.id._shere);
-        filter=findViewById(R.id._filter);
-        CenterImage=findViewById(R.id._center_image);
-        camera=findViewById(R.id._open_camera);
+        filter = findViewById(R.id._filter);
+        CenterImage = findViewById(R.id._center_image);
+        camera = findViewById(R.id._open_camera);
 
         camera.setOnClickListener(this);
         openFolder.setOnClickListener(this);
@@ -149,8 +159,7 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
         filter.setOnClickListener(this);
 
 
-
-        Uri selectedImgUri = getIntent().getData();
+        final Uri selectedImgUri = getIntent().getData();
         if (selectedImgUri != null) {
 //            try {
 //                Log.e("Uzair:Uri Recived", selectedImgUri.toString());
@@ -159,11 +168,28 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
 //            } catch (FileNotFoundException e) {
 //                e.printStackTrace();
 //            }
-            Picasso.get().load(selectedImgUri).fit().into(CenterImage);
 
-        }
-        else
-        {
+            Picasso.get().load(selectedImgUri).fit().into(CenterImage);
+            AlertDialog.Builder builder = new AlertDialog.Builder(main_dashbord.this);
+
+            builder.setMessage("Do you want to Edit this or Create a new file?")
+                    .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            edditing=true;
+                            edditingUri=selectedImgUri;
+                            dialog.cancel();
+                            // Yes-code
+                        }
+                    })
+                    .setNegativeButton("New file", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    })
+                    .show();
+        } else {
             start();
         }
 //              {
@@ -188,7 +214,7 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        ImageView clickedView=(ImageView)v;
+        ImageView clickedView = (ImageView) v;
         switch (v.getId()) {
             case R.id._folder:
                 Intent gallery = new Intent(Intent.ACTION_GET_CONTENT);
@@ -197,8 +223,7 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
                 startActivityForResult(gallery, RESULT_LOAD_IMAGE);
 
                 break;
-            case R.id._open_camera:
-            {
+            case R.id._open_camera: {
                 Log.e("uzair", "Croped clicked");
                 findViewById(R.id.main_screen).setVisibility(View.GONE);
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -206,14 +231,13 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
             }
             break;
         }
-        if(getCenterImage()==null)
+        if (getCenterImage() == null)
             return;
 
         switch (v.getId()) {
-            case R.id._rotate_left:
-            {
+            case R.id._rotate_left: {
                 if ((System.currentTimeMillis() - lastRotationEventTs) < 350) {
-                return;
+                    return;
                 }
                 RotateAnimation rotate = new RotateAnimation(90, 0, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
                 rotate.setDuration(150);
@@ -225,20 +249,19 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
                 //editPolygonView.
                 Matrix matrix = new Matrix();
                 matrix.postRotate(-90);
-                Bitmap myImg=((BitmapDrawable) CenterImage.getDrawable()).getBitmap();
+                Bitmap myImg = ((BitmapDrawable) CenterImage.getDrawable()).getBitmap();
                 Bitmap rotated = Bitmap.createBitmap(myImg, 0, 0, myImg.getWidth(), myImg.getHeight(),
                         matrix, true);
                 CenterImage.setImageBitmap(rotated);
                 lastRotationEventTs = System.currentTimeMillis();
                 break;
             }
-            case R.id._rotate_right:
-            {
+            case R.id._rotate_right: {
                 if ((System.currentTimeMillis() - lastRotationEventTs) < 350) {
                     return;
                 }
 
-                RotateAnimation rotate = new RotateAnimation(270,360 , Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                RotateAnimation rotate = new RotateAnimation(270, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
                 rotate.setDuration(150);
                 rotate.setInterpolator(new LinearInterpolator());
 
@@ -248,12 +271,13 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
                 //editPolygonView.
                 Matrix matrix = new Matrix();
                 matrix.postRotate(90);
-                Bitmap myImg=((BitmapDrawable) CenterImage.getDrawable()).getBitmap();
+                Bitmap myImg = ((BitmapDrawable) CenterImage.getDrawable()).getBitmap();
                 Bitmap rotated = Bitmap.createBitmap(myImg, 0, 0, myImg.getWidth(), myImg.getHeight(),
                         matrix, true);
                 CenterImage.setImageBitmap(rotated);
                 lastRotationEventTs = System.currentTimeMillis();
-                break;}
+                break;
+            }
             case R.id._delete: {
 
                 confirmationDialog();
@@ -268,7 +292,8 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
                 ft.addToBackStack(null);
                 ft.replace(R.id.fragements_frame, new CropActivity(), "Crop").commit();
 
-            }   break;
+            }
+            break;
 //            case R.id._shere:
 //                break;
 
@@ -284,36 +309,35 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
             }
 
         }
-
     }
 
     private void confirmationDialog() {
-            AlertDialog.Builder builder = new AlertDialog.Builder(main_dashbord.this);
 
-            builder
-                    .setMessage("Do you want to Discart this?")
-                    .setPositiveButton("Yes",  new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            start();
-                            // Yes-code
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog,int id) {
-                            dialog.cancel();
-                        }
-                    })
-                    .show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(main_dashbord.this);
+
+        builder
+                .setMessage("Do you want to Discart this?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        start();
+                        // Yes-code
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
 
     }
 
 
-    private  void start()
-    {
+    private void start() {
         Log.e("uzair", "Camera Started");
-        if(!isCameraPermissionGranted())
+        if (!isCameraPermissionGranted())
             return;
         findViewById(R.id.main_screen).setVisibility(View.GONE);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -326,46 +350,24 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-                cameraPermissionGranted=false;
+            cameraPermissionGranted = false;
 //            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
 //                    Manifest.permission.CAMERA)) {return  false;
 //            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.CAMERA},
-                        CAMERA_REQUEST_CODE);
-                return false;
-            }
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    CAMERA_REQUEST_CODE);
+            return false;
+        }
 
-        return  true;
-    }
-
-    public ImageView getSave() {
-        return save;
-    }
-
-    public void setSave(ImageView save) {
-        this.save = save;
-    }
-
-    public ImageView getOpenFolder() {
-        return openFolder;
-    }
-
-    public void setOpenFolder(ImageView openFolder) {
-        this.openFolder = openFolder;
+        return true;
     }
 
 
-    public ImageView getCrop() {
-        return crop;
-    }
 
-    public void setCrop(ImageView crop) {
-        this.crop = crop;
-    }
 
     public Bitmap getCenterImage() {
-        if(CenterImage.getDrawable()!=null)
+        if (CenterImage.getDrawable() != null)
             return ((BitmapDrawable) CenterImage.getDrawable()).getBitmap();
         else return null;
     }
@@ -375,14 +377,11 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
     }
 
     public CameraFragement getCameraFragement() {
-        if(cameraFragement==null)
-            cameraFragement=new CameraFragement();
+        if (cameraFragement == null)
+            cameraFragement = new CameraFragement();
         return cameraFragement;
     }
 
-    public void setCameraFragement(CameraFragement cameraFragement) {
-        this.cameraFragement = cameraFragement;
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -400,9 +399,8 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.save_image) {
-            Log.e("storage","i m about to save");
+            Log.e("storage", "i m about to save");
             SaveImage(getCenterImage());
-            startActivity(new Intent(main_dashbord.this,AllImagesActivity.class));
             return true;
         }
 
@@ -410,9 +408,9 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
     }
 
 
-    public int mkFolder(){//String folderName){ // make a folder under Environment.DIRECTORY_DCIM
+    public int mkFolder() {//String folderName){ // make a folder under Environment.DIRECTORY_DCIM
         String state = Environment.getExternalStorageState();
-        if (!Environment.MEDIA_MOUNTED.equals(state)){
+        if (!Environment.MEDIA_MOUNTED.equals(state)) {
             Log.d("myAppName", "Error: external storage is unavailable");
             return 0;
         }
@@ -436,26 +434,26 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
 //
 //            } else {
 
-                // No explanation needed, we can request the permission.
+            // No explanation needed, we can request the permission.
 
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
 
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
+            // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+            // app-defined int constant. The callback method gets the
+            // result of the request.
             //}
         }
         File folder = APP_FOLDER_ABSOLUTE_PATH;//new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),folderName);
-        Log.e("app Path",APP_FOLDER_ABSOLUTE_PATH.toString());
-        Log.e("current Path",folder.toString());
+        Log.e("app Path", APP_FOLDER_ABSOLUTE_PATH.toString());
+        Log.e("current Path", folder.toString());
 
         int result = 0;
         if (folder.exists()) {
-            Log.d("myAppName","folder exist:"+folder.toString());
+            Log.d("myAppName", "folder exist:" + folder.toString());
             result = 2; // folder exist
-        }else{
+        } else {
             try {
                 if (folder.mkdir()) {
                     Log.d("myAppName", "folder created:" + folder.toString());
@@ -464,7 +462,7 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
                     Log.e("Scane", "creat folder fails:" + folder.toString());
                     result = 0; // creat folder fails
                 }
-            }catch (Exception ecp){
+            } catch (Exception ecp) {
                 ecp.printStackTrace();
             }
         }
@@ -473,37 +471,165 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
     }
 
 
-    private void SaveImage(Bitmap finalBitmap) {
+    private void SaveImage(final Bitmap finalBitmap) {
 
-        if(mkFolder()==0)
+        if (mkFolder() == 0)
+            return ;
+        if(edditing)
+        {
+            saveEdditingFile(finalBitmap);
+            startActivity(new Intent(main_dashbord.this,
+                    AllImagesActivity.class));
             return;
-        File myDir =APP_FOLDER_ABSOLUTE_PATH;// new File(APP_FOLDER_ABSOLUTE_PATH.toString());
-        //myDir.mkdir();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ssmmHHddMMyy");
-        String  fname = simpleDateFormat.format(new Date())+".jpg";
-        //String fname = "Image-.jpg";
-        File file = new File (myDir, fname);
-        if (file.exists ()) file.delete ();
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(main_dashbord.this);
+
+        builder
+                .setTitle("Save As...")
+                .setItems(new CharSequence[]{"JPEG/jpg", "PNG", "PDF"}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                saveAsImageFile(finalBitmap, Bitmap.CompressFormat.JPEG);
+                                break;
+                            case 1:
+                                saveAsImageFile(finalBitmap, Bitmap.CompressFormat.PNG);
+                                break;
+                            case 2: {
+                                saveAsPDF(finalBitmap);
+
+                                break;
+                            }
+                        }
+                        startActivity(new Intent(main_dashbord.this,
+                                AllImagesActivity.class));
+
+                    }
+                })
+
+                .show();
+
+
+    }
+
+    private  void saveAsPDF(Bitmap finalBitmap) {
+    {
+        PdfDocument d=new PdfDocument();
+
+        Document document=new Document();
+        String dirpath=android.os.Environment.getExternalStorageDirectory().toString();
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ssmmHHddMMyy");
+            String fname = simpleDateFormat.format(new Date());
+            PdfWriter.getInstance(document,new FileOutputStream(
+                    APP_FOLDER_ABSOLUTE_PATH.getAbsoluteFile()+"/Scane_"+fname+".pdf")); //  Change pdf's name.
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            finalBitmap.compress(Bitmap.CompressFormat.PNG,100,stream);
+            Image img =Image.getInstance(stream.toByteArray());  // Change image's name and extension.
+            document.open();
+
+        float scaler = ((document.getPageSize().getWidth() - document.leftMargin()
+                - document.rightMargin() - 0) / img.getWidth()) * 100; // 0 means you have no indentation. If you have any, change it.
+        img.scalePercent(scaler);
+        img.setAlignment(Image.ALIGN_CENTER | Image.ALIGN_TOP);
+        //img.setAlignment(Image.LEFT| Image.TEXTWRAP);
+
+ /* float width = document.getPageSize().width() - document.leftMargin() - document.rightMargin();
+ float height = document.getPageSize().height() - document.topMargin() - document.bottomMargin();
+ img.scaleToFit(width, height) Or try this.
+**/
+        document.add(img);
+        document.close();
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    }
+    private void saveEdditingFile(Bitmap finalBitmap) {
+
+
+        File file = new File(edditingUri.getPath());
+        //if (file.exists()) file.delete();
+        Bitmap.CompressFormat format=null;
+        String extension=file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf("."));
+        switch (extension)
+        {
+            case ".jpeg":
+            case ".jpg":
+                format=Bitmap.CompressFormat.JPEG;
+                break;
+            case ".png":
+                format=Bitmap.CompressFormat.PNG;
+                break;
+        }
 
         try {
 //            int i=1;
 //            while(file.exists ())
 //                file=new File (myDir,i+fname);
-            Log.e("file",file.toString());
+            Log.e("file", file.toString());
             //file.createNewFile();
-            FileOutputStream out = new FileOutputStream(file);
-            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-            Log.d("saved",file.toString());
+            FileOutputStream out = new FileOutputStream(file,false);
+            finalBitmap.compress(format, 90, out);
+            Log.d("saved", file.toString());
             out.flush();
             out.close();
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("Not saved",file.toString());
+            Log.e("Not saved", file.toString());
+
+        }
+        return;
+    }
+
+    private static void saveAsImageFile(Bitmap finalBitmap, Bitmap.CompressFormat formate) {
+
+        File myDir = APP_FOLDER_ABSOLUTE_PATH;// new File(APP_FOLDER_ABSOLUTE_PATH.toString());
+        //myDir.mkdir();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ssmmHHddMMyy");
+
+        String extension=null;
+           if( formate==Bitmap.CompressFormat.JPEG)
+                extension=".jpg";
+
+            if(formate== Bitmap.CompressFormat.PNG)
+                extension="png";
+
+
+        String fname = simpleDateFormat.format(new Date()) + extension;
+        //String fname = "Image-.jpg";
+        File file = new File(myDir, fname);
+        if (file.exists()) file.delete();
+
+        try {
+//            int i=1;
+//            while(file.exists ())
+//                file=new File (myDir,i+fname);
+            Log.e("file", file.toString());
+            //file.createNewFile();
+            FileOutputStream out = new FileOutputStream(file);
+            finalBitmap.compress(formate, 90, out);
+            Log.d("saved", file.toString());
+            out.flush();
+            out.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Not saved", file.toString());
 
         }
     }
-
 
 
     private static void SaveImage2(Bitmap finalBitmap) {
@@ -513,8 +639,8 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
         myDir.mkdirs();
 
         String fname = "Image-.jpg";
-        File file = new File (myDir, fname);
-        if (file.exists ()) file.delete ();
+        File file = new File(myDir, fname);
+        if (file.exists()) file.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
             finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
@@ -525,7 +651,6 @@ public class main_dashbord extends AppCompatActivity implements View.OnClickList
             e.printStackTrace();
         }
     }
-
 
 
 
